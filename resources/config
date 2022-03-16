@@ -3,7 +3,7 @@
      "sql_dms_db": [
       {
 
-          "sql_dms_server": "10.250.98.159",
+          "sql_dms_server": "10.250.98.143",
           "sql_dms_username": "admin_is",
           "sql_dms_password": "Iiostgdb@2020",
           "sql_dms_database": "IIOSTG"
