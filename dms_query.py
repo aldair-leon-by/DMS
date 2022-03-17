@@ -10,6 +10,7 @@ query_parent_message_id = 'SELECT TOP (1) PARENT_MESSAGEID FROM CRTD.CRTD_STATUS
 query_message_id = 'SELECT PARENT_MESSAGEID,MESSAGEID,STATUS,FINAL_STATUS,CREATED_DATETIME,MODIFIED_DATETIME ' \
                    'FROM CRTD.CRTD_STATUS WHERE PARENT_MESSAGEID IN (?);'
 query_error = 'SELECT * FROM ERROR.ERROR  WHERE MessageID IN (?);'
+query_receiver_entity_map = 'SELECT * FROM CRTD.CRTD_RECEIVER_ENTITY_MAP;'
 
 
 def dms_status_table_parent_message_id():
@@ -76,3 +77,13 @@ def dms_error_table_file_name(file_name="", error_type="", date="", column=""):
         logger.info(query_error_file_name)
         logger.error(e)
     return error
+
+def dms_receiver_entity_map():
+    connection = dms_sql_connection()
+    try:
+        logger.info('Executing query... DMS receiver_entity_map')
+        receiver_entity_map = pd.read_sql_query(query_receiver_entity_map, con=connection)
+        return receiver_entity_map
+    except pyodbc.Error as ex:
+        logger.log('ERROR QUERY RECEIVER ENTITY MAP')
+        logger.error(ex)

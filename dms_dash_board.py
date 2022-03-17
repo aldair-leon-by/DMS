@@ -14,6 +14,14 @@ app.layout = html.Div([
             html.Button(id='status_table_update', n_clicks=0, children='Status')
         ]
     ), html.Br(), html.Div(id='table_status'), html.Br(),
+
+    html.Div(
+        [
+            # dcc.Interval(id='status_table', interval=1000),
+            html.Button(id='entity_map_update', n_clicks=0, children='entity_map')
+        ]
+    ), html.Br(), html.Div(id='table_entity_map'), html.Br(),
+
     html.Div(
         [
             # dcc.Interval(id='error_table', interval=1000),
@@ -53,6 +61,20 @@ app.layout = html.Div([
               [dash.dependencies.Input(component_id='status_table_update', component_property='n_clicks')])
 def update_graph_scatter(status_table_update):
     df = dms_status_table_message_id()
+
+    return dbc.Table.from_dataframe(
+        df,
+        hover=True,
+        bordered=True,
+        striped=True,
+        size='sm',
+        responsive=True
+    )
+
+@app.callback(dash.dependencies.Output('table_entity_map', 'children'),
+              [dash.dependencies.Input(component_id='entity_map_update', component_property='n_clicks')])
+def update_graph_scatter(entity_map_update):
+    df = dms_receiver_entity_map()
 
     return dbc.Table.from_dataframe(
         df,
