@@ -1,31 +1,28 @@
-from dash import Dash, dcc, html, Input, Output, State, callback_context
+import time
+from kafka import KafkaConsumer
 
-external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-
-app = Dash(__name__, external_stylesheets=external_stylesheets)
-
-options = ["New York City", "Montréal", "San Francisco"]
-
-app.layout = html.Div(
-    [
-        dcc.Checklist(["All"], [], id="all-checklist", inline=True),
-        dcc.Checklist(options, [], id="city-checklist", inline=True),
-    ]
+consumer = KafkaConsumer(
+    bootstrap_servers=['10.250.98.159:9092'],
+    auto_offset_reset='earliest',
+    group_id='DTS-JLAB-4',
 )
-@app.callback(
-    Output("city-checklist", "value"),
-    Output("all-checklist", "value"),
-    Input("city-checklist", "value"),
-    Input("all-checklist", "value"),
-)
-def sync_checklists(cities_selected, all_selected):
-    ctx = callback_context
-    input_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    if input_id == "city-checklist":
-        all_selected = ["All"] if set(cities_selected) == set(options) else []
-    else:
-        cities_selected = options if all_selected else []
-    return cities_selected, all_selected
+consumer.subscribe(['ingestionTopic'])
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
+while True:
+    try:
+        message = consumer.poll(10.0)
+
+        if not message:
+            time.sleep(120)  # Sleep for 2 minutes
+
+        if message.error():
+            print(f"Consumer error: {message.error()}")
+            continue
+
+        print(f"Received message: {message.value().decode('utf-8')}")
+    except:
+        # Handle any exception here
+        ...
+    finally:
+        consumer.close()
+        print("Goodbye")
